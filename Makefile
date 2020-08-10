@@ -53,7 +53,7 @@ OBJS = src/main/romloader.o \
         src/main/main.o
 
 INCDIR += src/main src/boost
-CFLAGS = -DPSP -G0 -Wall -g
+CFLAGS = -DPSP -G0 -Wall -g -O3
 CXXFLAGS = $(CFLAGS)
 ASFLAGS = $(CFLAGS)
 
