@@ -150,12 +150,20 @@ static void process_events(void)
     sceCtrlReadBufferPositive(&pad, 1); 
     if (pad.Buttons != 0){
 			if (pad.Buttons & PSP_CTRL_SQUARE) {
+                input.psp_handle_key(pad.Buttons & PSP_CTRL_SQUARE);
+
 			}
 			if (pad.Buttons & PSP_CTRL_TRIANGLE) {
+                input.psp_handle_key(pad.Buttons & PSP_CTRL_TRIANGLE);
+                
 			} 
 			if (pad.Buttons & PSP_CTRL_CIRCLE) {
+                input.psp_handle_key(pad.Buttons & PSP_CTRL_CIRCLE);
+
 			} 
 			if (pad.Buttons & PSP_CTRL_CROSS) {
+                input.psp_handle_key(pad.Buttons & PSP_CTRL_CROSS);
+
 			} 
 
 			if (pad.Buttons & PSP_CTRL_UP) {
