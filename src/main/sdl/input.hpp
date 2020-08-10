@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include <SDL.h>
+#include <SDL/SDL.h>
 
 class Input
 {
@@ -71,6 +71,12 @@ public:
     bool is_pressed(presses p);
     bool is_pressed_clear(presses p);
     bool has_pressed(presses p);
+
+    #ifdef PSP
+    void psp_handle_key(unsigned int);
+    void psp_handle_release();
+
+    #endif
 
 private:
     static const int CENTRE = 0x80;

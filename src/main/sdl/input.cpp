@@ -12,6 +12,32 @@
 #include <cstdlib> // abs
 #include "sdl/input.hpp"
 
+#ifdef PSP
+
+#define PSP_CTRL_SELECT 0x000001
+#define PSP_CTRL_START 0x000008
+#define PSPS_CTRL_START 0x000008
+
+
+#define PSP_CTRL_UP 0x000010 
+#define PSP_CTRL_RIGHT 0x000020
+#define PSP_CTRL_DOWN 0x000040 
+#define PSP_CTRL_LEFT 0x000080
+
+#define PSP_CTRL_LTRIGGER 0x000100 
+#define PSP_CTRL_RTRIGGER 0x000200
+#define PSP_CTRL_TRIANGLE 0x001000
+#define PSP_CTRL_CIRCLE 0x002000
+#define PSP_CTRL_CROSS  0x004000
+#define PSP_CTRL_SQUARE 0x008000
+
+#define PSP_CTRL_HOME 0x010000
+#define PSP_CTRL_HOLD 0x020000
+
+#endif
+
+
+
 Input input;
 
 Input::Input(void)
@@ -84,6 +110,71 @@ void Input::handle_key_up(SDL_keysym* keysym)
 {
     handle_key(keysym->sym, false);
 }
+
+#ifdef PSP 
+void Input::psp_handle_key(unsigned int flag)
+{
+    if(flag ==  PSP_CTRL_DOWN)
+        keys[DOWN] = true;
+
+    if(flag ==  PSP_CTRL_UP)
+        keys[UP] = true;
+
+    if(flag == PSP_CTRL_RIGHT)
+        keys[RIGHT] = true;
+    
+    if(flag == PSP_CTRL_LEFT)
+        keys[LEFT] = true;
+    
+    if(flag ==  PSPS_CTRL_START)
+        keys[START] = true;
+
+    if(flag == PSP_CTRL_CROSS)
+        keys[ACCEL] = true;
+
+    if(flag == PSP_CTRL_CIRCLE)
+        keys[BRAKE] = true;
+
+    if(flag == PSP_CTRL_HOME)
+        keys[MENU] = true;
+
+    if(flag == PSP_CTRL_SELECT)
+        keys[COIN] = true;
+
+    if(flag == PSP_CTRL_LTRIGGER)
+        keys[GEAR1] = true;
+    
+    if(flag == PSP_CTRL_RTRIGGER)
+        keys[GEAR2] = true;
+
+    if(flag == PSP_CTRL_HOLD)
+        keys[VIEWPOINT] = true;
+
+ 
+}
+
+void Input::psp_handle_release()
+{
+    keys[DOWN] = false;
+    keys[UP] = false;
+    keys[RIGHT] = false;
+    keys[LEFT] = false;
+    keys[START] = false;
+    keys[ACCEL] = false;
+    keys[BRAKE] = false;
+    keys[MENU] = false;
+    keys[COIN] = false;
+    keys[GEAR1] = false;
+    keys[GEAR2] = false;
+    keys[VIEWPOINT] = false;
+
+
+}
+
+
+#endif
+
+
 void Input::handle_key(const int key, const bool is_pressed)
 {
     // Redefinable Key Input

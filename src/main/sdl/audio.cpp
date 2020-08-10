@@ -15,10 +15,12 @@
 ***************************************************************************/
 
 #include <iostream>
-#include <SDL.h>
+#include <SDL/SDL.h>
 #include "sdl/audio.hpp"
 #include "frontend/config.hpp" // fps
 #include "engine/audio/osoundint.hpp"
+
+#include <cstring>
 
 #ifdef COMPILE_SOUND_CODE
 

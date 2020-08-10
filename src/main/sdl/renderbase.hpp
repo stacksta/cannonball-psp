@@ -4,7 +4,7 @@
 #include "../globals.hpp"
 #include "../setup.hpp"
 
-#include <SDL.h>
+#include <SDL/SDL.h>
 
 // Abstract Rendering Class
 class RenderBase

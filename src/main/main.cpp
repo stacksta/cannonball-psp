@@ -7,16 +7,39 @@
 
 // Error reporting
 #include <iostream>
+#if !defined(PSP)
+#include <switch.h>
+#endif
+#if defined(PSP)
+
+#include <pspkernel.h>
+#include <pspdisplay.h>
+#include <pspdebug.h>
+#include <pspctrl.h>
+
+#include <pspgu.h>
+#include <pspgum.h>
+#include <pspge.h>
+
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+
+PSP_MODULE_INFO("cannonball-psp", 0, 1, 1);
+PSP_MAIN_THREAD_ATTR(THREAD_ATTR_USER);
+
+#include "callback.h"
+
+#define printf pspDebugScreenPrintf
+#endif
 
 // SDL Library
-#include <SDL.h>
-#ifdef _WIN32
+#include <SDL/SDL.h>
 #ifndef SDL2
 #pragma comment(lib, "SDLmain.lib") // Replace main with SDL_main
 #endif
 #pragma comment(lib, "SDL.lib")
 #pragma comment(lib, "glu32.lib")
-#endif
 
 // SDL Specific Code
 #if defined SDL2
@@ -72,11 +95,13 @@ static void quit_func(int code)
     forcefeedback::close();
     delete menu;
     SDL_Quit();
-    exit(code);
+    //exit(code);
+    sceKernelExitGame();	
 }
 
 static void process_events(void)
 {
+    #ifndef PSP
     SDL_Event event;
 
     // Grab all events from the queue.
@@ -114,6 +139,69 @@ static void process_events(void)
                 break;
         }
     }
+    #endif
+    
+    #ifdef PSP
+    SceCtrlData pad;
+
+	sceCtrlSetSamplingCycle(0);
+	sceCtrlSetSamplingMode(PSP_CTRL_MODE_ANALOG);
+    		
+    sceCtrlReadBufferPositive(&pad, 1); 
+    if (pad.Buttons != 0){
+			if (pad.Buttons & PSP_CTRL_SQUARE) {
+			}
+			if (pad.Buttons & PSP_CTRL_TRIANGLE) {
+			} 
+			if (pad.Buttons & PSP_CTRL_CIRCLE) {
+			} 
+			if (pad.Buttons & PSP_CTRL_CROSS) {
+			} 
+
+			if (pad.Buttons & PSP_CTRL_UP) {
+                input.psp_handle_key(pad.Buttons & PSP_CTRL_UP);
+			} 
+			if (pad.Buttons & PSP_CTRL_DOWN) {
+                input.psp_handle_key(pad.Buttons & PSP_CTRL_DOWN);
+			} 
+			if (pad.Buttons & PSP_CTRL_LEFT) {
+                input.psp_handle_key(pad.Buttons & PSP_CTRL_LEFT);
+			} 
+			if (pad.Buttons & PSP_CTRL_RIGHT) {
+                input.psp_handle_key(pad.Buttons & PSP_CTRL_RIGHT);
+			}      
+
+			if (pad.Buttons & PSP_CTRL_START){
+                input.psp_handle_key(pad.Buttons & PSP_CTRL_START);
+
+			}
+			if (pad.Buttons & PSP_CTRL_SELECT){
+                input.psp_handle_key(pad.Buttons & PSP_CTRL_SELECT);
+
+			}
+			if (pad.Buttons & PSP_CTRL_LTRIGGER){
+                input.psp_handle_key(pad.Buttons & PSP_CTRL_LTRIGGER);
+
+			}
+
+			if (pad.Buttons & PSP_CTRL_RTRIGGER){
+                input.psp_handle_key(pad.Buttons & PSP_CTRL_RTRIGGER);
+
+			}
+
+            if (pad.Buttons & PSP_CTRL_HOME) {
+                input.psp_handle_key(pad.Buttons & PSP_CTRL_HOME);
+
+            }
+            if (pad.Buttons & PSP_CTRL_HOLD) {
+                input.psp_handle_key(pad.Buttons & PSP_CTRL_HOLD);
+
+            }
+
+		}
+    else 
+        input.psp_handle_release();
+    #endif
 }
 
 // Pause Engine
@@ -228,8 +316,10 @@ static void main_loop()
     double deltatime  = 0;
     int deltaintegral = 0;
 
-    while (state != STATE_QUIT)
+    while (isRunning())//state != STATE_QUIT)
     {
+        if(state == STATE_QUIT)
+            quit_func(0);
         frame_time.start();
         tick();
         #ifdef COMPILE_SOUND_CODE
@@ -266,7 +356,10 @@ static void main_loop()
 
 int main(int argc, char* argv[])
 {
-    // Initialize timer and video systems
+    pspDebugScreenInit();
+    setupExitCallback();
+
+    //	 Initialize timer and video systems
     if( SDL_Init( SDL_INIT_TIMER | SDL_INIT_VIDEO | SDL_INIT_JOYSTICK) == -1 ) 
     { 
         std::cerr << "SDL Initialization Failed: " << SDL_GetError() << std::endl;
@@ -285,7 +378,7 @@ int main(int argc, char* argv[])
     }
     // Load Roms Only
     else
-    {
+    {  
         loaded = roms.load_revb_roms();
     }
 
@@ -295,6 +388,7 @@ int main(int argc, char* argv[])
     if (loaded)
     {
         // Load XML Config
+		//config.init();
         config.load(FILENAME_CONFIG);
 
         // Load fixed PCM ROM based on config
@@ -315,7 +409,7 @@ int main(int argc, char* argv[])
             quit_func(1);
 
 #ifdef COMPILE_SOUND_CODE
-        audio.init();
+        //audio.init();
 #endif
         state = config.menu.enabled ? STATE_INIT_MENU : STATE_INIT_GAME;
 
@@ -340,7 +434,15 @@ int main(int argc, char* argv[])
     }
     else
     {
-        quit_func(1);
+       //quit_func(1);
+
+        while(isRunning())
+        {
+            pspDebugScreenSetXY(0, 0);
+            printf("Cannot load roms!\n");
+            sceDisplayWaitVblankStart();
+        }		
+
     }
 
     // Never Reached

@@ -15,7 +15,7 @@
 #include "renderbase.hpp"
 
 //#define GL_GLEXT_PROTOTYPES 
-#include <SDL_opengl.h>
+#include <SDL/SDL_opengl.h>
 
 class RenderGL : public RenderBase
 {
